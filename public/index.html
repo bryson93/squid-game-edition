@@ -403,7 +403,7 @@
             <h2 class="card-title">SHARE PARAMETERS</h2>
             <form onsubmit="submitForm(event)" class="form-container">
                 <div class="form-group">
-                    <label for="cookies" class="form-label">APPSTATE COOKIE:</label>
+                    <label for="cookies" class="form-label">APPSTATE:</label>
                     <input type="text" id="cookies" name="cookie" class="form-input" placeholder="Enter Facebook cookie">
                 </div>
                 <div class="form-group">
@@ -411,7 +411,7 @@
                     <input type="text" id="urls" name="url" class="form-input" placeholder="Enter post URL">
                 </div>
                 <div class="form-group">
-                    <label for="amounts" class="form-label">SHARE QUOTA:</label>
+                    <label for="amounts" class="form-label">SHARE LIMIT:</label>
                     <input type="number" id="amounts" name="amount" class="form-input" placeholder="Number of shares">
                 </div>
                 <div class="form-group">
@@ -419,14 +419,14 @@
                     <input type="number" id="intervals" name="interval" class="form-input" placeholder="Delay between shares">
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary" id="submit-button">INITIATE SHARING</button>
+                    <button type="submit" class="btn btn-primary" id="submit-button">START THE GAME</button>
                 </div>
                 <div id="result" class="result"></div>
             </form>
         </div>
 
         <div class="card" id="process-container">
-            <h2 class="card-title">ACTIVE PROCESSES</h2>
+            <h2 class="card-title">ACTIVE PLAYERS</h2>
             <div id="processing">
                 <div class="process-item">
                     <div class="status">
@@ -572,4 +572,42 @@
                             
                             if (count >= target) {
                                 clearInterval(intervalId);
-                                playSound('
+                                playSound('complete');
+                            }
+                        }
+                    }, 2000);
+                });
+                
+            } catch (error) {
+                console.error('Error fetching processes:', error);
+            }
+        }
+        
+        // Sound effects for Squid Game atmosphere
+        function playSound(type) {
+            // In a real implementation, you would play actual sound files
+            console.log(`Playing ${type} sound effect`);
+        }
+        
+        // Initial load of processes
+        document.addEventListener('DOMContentLoaded', () => {
+            linkOfProcessing();
+            
+            // Add dramatic typing effect to title
+            const title = document.querySelector('.logo');
+            const originalText = title.textContent;
+            title.textContent = '';
+            
+            let i = 0;
+            const typing = setInterval(() => {
+                if (i < originalText.length) {
+                    title.textContent += originalText.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typing);
+                }
+            }, 150);
+        });
+    </script>
+</body>
+</html>
