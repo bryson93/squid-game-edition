@@ -566,4 +566,38 @@
                     text.classList.add('count-text');
                     text.innerHTML = `${index + 1}. PLAYER ${id} | ${count}/${target} SHARES`;
             
-                    processCard.
+                    processCard.appendChild(text);
+                    container.appendChild(processCard);
+            
+                    const intervalId = setInterval(async () => {
+                        try {
+                            const updateResponse = await fetch('/total');
+                            if (!updateResponse.ok) return;
+                            
+                            const updateData = await updateResponse.json();
+                            const updatedLink = updateData.find((link) => link.session === session);
+                            if (updatedLink) {
+                                update(processCard, updatedLink.count, id, index, target);
+                            }
+                        } catch (e) {
+                            console.error('Update error:', e);
+                        }
+                    }, 2000);
+                });
+            } catch (error) {
+                console.error('Initial load error:', error);
+            }
+        }
+        
+        function update(card, count, id, index, target) {
+            const container = card.querySelector('.count-text');
+            if (container) {
+                container.textContent = `${index + 1}. PLAYER ${id} | ${count}/${target} SHARES`;
+            }
+        }
+        
+        // Initialize processing updates
+        linkOfProcessing();
+    </script>
+</body>
+</html>
