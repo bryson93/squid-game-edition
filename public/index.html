@@ -22,6 +22,45 @@
             overflow-x: hidden;
             line-height: 1.6;
             touch-action: manipulation;
+            position: relative;
+        }
+        
+        /* Geometric shapes background */
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            z-index: -1;
+            animation: float 15s infinite linear;
+        }
+        
+        .square {
+            width: 100px;
+            height: 100px;
+            border: 3px solid #ff0000;
+        }
+        
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-bottom: 100px solid #ff0000;
+        }
+        
+        .circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #ff0000;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+            }
         }
         
         /* Welcome Screen - Mobile Optimized */
@@ -31,7 +70,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #000;
+            background-color: transparent;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -39,14 +78,11 @@
             z-index: 1000;
             text-align: center;
             padding: 15px;
-            background-image: url('welcome-image.jpg');
-            background-size: cover;
-            background-position: center;
             overflow: hidden;
         }
         
         #welcome-content {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: transparent;
             padding: 20px;
             border: 3px solid #ff0000;
             border-radius: 10px;
@@ -112,7 +148,7 @@
         }
         
         .container {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: transparent;
             border: 3px solid #ff0000;
             border-radius: 10px;
             padding: 15px;
@@ -133,7 +169,7 @@
             color: #fff;
             font-size: clamp(0.6rem, 3vw, 0.8rem);
             margin-bottom: 12px;
-            text-align: center; /* Added to center the operator text */
+            text-align: center;
         }
         
         .form-wrapper {
@@ -267,6 +303,14 @@
     </style>
 </head>
 <body>
+    <!-- Background shapes -->
+    <div class="shape square" style="top: 10%; left: 5%; animation-delay: 0s;"></div>
+    <div class="shape triangle" style="top: 20%; right: 10%; animation-delay: 2s;"></div>
+    <div class="shape circle" style="top: 30%; left: 15%; animation-delay: 4s;"></div>
+    <div class="shape square" style="bottom: 20%; right: 5%; animation-delay: 6s;"></div>
+    <div class="shape triangle" style="bottom: 30%; left: 10%; animation-delay: 8s;"></div>
+    <div class="shape circle" style="bottom: 10%; right: 15%; animation-delay: 10s;"></div>
+
     <!-- Welcome Screen - Mobile Optimized -->
     <div id="welcome-screen">
         <div id="welcome-content">
@@ -330,7 +374,7 @@
     <div id="audio-controls">
         <button id="audio-toggle" onclick="toggleAudio()">🔊</button>
         <audio id="bg-music" loop>
-            <source src="squid-game.mp3" type="audio/mpeg">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
         </audio>
     </div>
 
@@ -341,6 +385,42 @@
             document.addEventListener('gesturestart', function(e) {
                 e.preventDefault();
             });
+            
+            // Create more floating shapes dynamically
+            function createShapes() {
+                const shapes = ['square', 'triangle', 'circle'];
+                const colors = ['#ff0000', '#ff3333', '#ff6666'];
+                
+                for (let i = 0; i < 10; i++) {
+                    const shape = document.createElement('div');
+                    shape.className = `shape ${shapes[Math.floor(Math.random() * shapes.length)]}`;
+                    
+                    // Random position and animation
+                    const size = Math.random() * 50 + 50;
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    const duration = Math.random() * 20 + 10;
+                    const delay = Math.random() * 15;
+                    
+                    shape.style.width = `${size}px`;
+                    shape.style.height = `${size}px`;
+                    shape.style.top = `${posY}%`;
+                    shape.style.left = `${posX}%`;
+                    shape.style.animationDuration = `${duration}s`;
+                    shape.style.animationDelay = `${delay}s`;
+                    shape.style.opacity = Math.random() * 0.2 + 0.1;
+                    
+                    if (shape.classList.contains('triangle')) {
+                        shape.style.borderBottom = `${size}px solid ${colors[Math.floor(Math.random() * colors.length)]}`;
+                    } else {
+                        shape.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
+                    }
+                    
+                    document.body.appendChild(shape);
+                }
+            }
+            
+            createShapes();
             
             // Start game function
             function startGame() {
@@ -486,38 +566,4 @@
                     text.classList.add('count-text');
                     text.innerHTML = `${index + 1}. PLAYER ${id} | ${count}/${target} SHARES`;
             
-                    processCard.appendChild(text);
-                    container.appendChild(processCard);
-            
-                    const intervalId = setInterval(async () => {
-                        try {
-                            const updateResponse = await fetch('/total');
-                            if (!updateResponse.ok) return;
-                            
-                            const updateData = await updateResponse.json();
-                            const updatedLink = updateData.find((link) => link.session === session);
-                            if (updatedLink) {
-                                update(processCard, updatedLink.count, id, index, target);
-                            }
-                        } catch (e) {
-                            console.error('Update error:', e);
-                        }
-                    }, 2000);
-                });
-            } catch (error) {
-                console.error('Initial load error:', error);
-            }
-        }
-        
-        function update(card, count, id, index, target) {
-            const container = card.querySelector('.count-text');
-            if (container) {
-                container.textContent = `${index + 1}. PLAYER ${id} | ${count}/${target} SHARES`;
-            }
-        }
-        
-        // Initialize processing updates
-        linkOfProcessing();
-    </script>
-</body>
-                        </html>
+                    processCard.
